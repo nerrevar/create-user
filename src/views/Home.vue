@@ -1,18 +1,21 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
-  </div>
+  <CreateUserForm
+    class="form"
+    title="Создать пользователя"
+    sendText="Отправить"
+    :fields="fields"
+  />
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import HelloWorld from '@/components/HelloWorld.vue' // @ is an alias to /src
+<script lang="ts" setup>
+import CreateUserForm, { IFormField } from '@/components/CreateUserForm.vue'
+import { v1 as uuid } from 'uuid'
 
-export default defineComponent({
-  name: 'Home',
-  components: {
-    HelloWorld
+const fields: IFormField[] = [
+  {
+    type: 'text',
+    uuid: uuid(),
+    label: 'nickname'
   }
-})
+]
 </script>
