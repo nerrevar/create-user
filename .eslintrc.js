@@ -13,7 +13,15 @@ module.exports = {
   },
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    curly: [
+      'warn',
+      'multi'
+    ],
+    'brace-style': [
+      'error',
+      'stroustrup'
+    ]
   },
   overrides: [
     {

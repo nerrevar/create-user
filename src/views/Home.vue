@@ -37,6 +37,7 @@ const fields: IFormField[] = [
     uuid: uuid(),
     label: 'Position',
     required: false,
+    placeholder: 'Select the position',
     options: [
       {
         id: 1,
@@ -79,19 +80,32 @@ const fields: IFormField[] = [
     type: 'phone',
     uuid: uuid(),
     label: 'Phone number',
-    required: false
+    required: false,
+    placeholder: '+7 XXX XXX XX XX'
   },
   {
     type: 'password',
     uuid: uuid(),
     label: 'Password',
-    required: true
+    required: true,
+    placeholder: 'Password'
   },
   {
     type: 'password',
     uuid: uuid(),
     label: 'Confirm password',
-    required: true
+    required: true,
+    placeholder: 'Retype password'
   }
 ]
+fields.forEach((el: IFormField) => {
+  if (el.reference) {
+    el.reference =
+      el.reference
+        .map((el: string) =>
+          fields.find((field: IFormField) => field.label === el)?.uuid
+        )
+        .filter(el => !!el)
+  }
+})
 </script>
