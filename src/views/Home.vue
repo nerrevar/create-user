@@ -1,4 +1,9 @@
 <template>
+  <div
+    v-if="result"
+    class="result"
+    v-html="result.replaceAll(',', '<br />')"
+  />
   <CreateUserForm
     class="form"
     title="Создать пользователя"
@@ -15,6 +20,7 @@
 </template>
 
 <script lang="ts" setup>
+import { ref } from 'vue'
 import CreateUserForm, { IFormField } from '@/components/CreateUserForm.vue'
 import { required, email } from '@vuelidate/validators'
 import { v1 as uuid } from 'uuid'
@@ -130,10 +136,16 @@ fields.forEach((el: IFormField) => {
         .filter((el: string | undefined) => !!el) as string[] | undefined
 })
 
+const result = ref('')
+
 const sendForm = async (data: { [key: string]: string }): Promise<void> => {
   setTimeout(
-    () => console.table(JSON.parse(JSON.stringify(data))),
+    () => result.value = JSON.stringify(data),
     100
+  )
+  setTimeout(
+    () => result.value = '',
+    5000
   )
 }
 

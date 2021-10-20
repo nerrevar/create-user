@@ -16,7 +16,7 @@
         {{ item.label }}
         <span
           v-if="item.required"
-          style="color: var(--text-color-danger)"
+          style="color: var(--pink-500)"
         >
           *
         </span>
@@ -76,7 +76,7 @@
         {{ item.label }}
         <span
           v-if="item.required"
-          style="color: var(--text-color-danger)"
+          style="color: var(--pink-500)"
         >
           *
         </span>
@@ -108,7 +108,7 @@
 
       <div
         class="form__error"
-        style="color: var(--text-danger)"
+        style="color: var(--pink-500)"
         v-for="(item, index) in v$[item.formField]?.$errors"
         :key="index"
       >
