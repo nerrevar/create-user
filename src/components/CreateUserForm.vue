@@ -27,29 +27,32 @@
         v-if="['text', 'email'].includes(item.type)"
         :id="item.uuid"
         :placeholder="item.placeholder"
-        v-model="formData[item.uuid]"
+        v-model="formData[item.formField]"
       />
       <Calendar
         v-if="item.type === 'date'"
+        :id="item.uuid"
         :monthNavigator="true"
         :yearNavigator="true"
         :yearRange="`1900:${ new Date().getFullYear() }`"
-        v-model="formData[item.uuid]"
+        v-model="formData[item.formField]"
       />
       <Dropdown
         v-if="item.type === 'select'"
+        :id="item.uuid"
         :options="item.options"
         optionLabel="name"
         optionValue="id"
         :placeholder="item.placeholder"
-        v-model="formData[item.uuid]"
+        v-model="formData[item.formField]"
       />
       <Checkbox
         v-if="item.type === 'checkbox'"
+        :id="item.uuid"
         :binary="true"
         :value="item.value"
         :disabled="item.disabled"
-        v-model="formData[item.uuid]"
+        v-model="formData[item.formField]"
       />
       <label
         v-if="item.type === 'checkbox'"
@@ -65,19 +68,23 @@
       </label>
       <InputMask
         v-if="item.type === 'phone'"
+        :id="item.uuid"
         mask="+7 999 999 99 99"
         :placeholder="item.placeholder"
-        v-model="formData[item.uuid]"
+        v-model="formData[item.formField]"
       />
       <Password
         v-if="item.type === 'password'"
+        :id="item.uuid"
         :placeholder="item.placeholder"
-        v-model="formData[item.uuid]"
+        v-model="formData[item.formField]"
+        @change="formData[item.formField] = $event.data"
       />
     </div>
+    <slot />
     <Button
       :label="sendText"
-      @click="sendForm"
+      @click="$emit('submit', formData)"
     />
   </div>
 </template>
@@ -93,6 +100,7 @@ export interface ISelectOption {
 export interface IFormField {
   type: 'text' | 'email' | 'date' | 'select' | 'checkbox' | 'phone' | 'password',
   uuid: string,
+  formField: string,
   label: string,
   required: boolean,
   placeholder?: string,
@@ -115,7 +123,7 @@ const filteredFields = computed(() => props.fields.filter(el =>
 const formData = reactive<{ [key: string]: string | number | boolean }>({})
 props.fields.forEach(el => {
   if (el.value)
-    formData[el.uuid] = el.value
+    formData[el.formField] = el.value
   else
     switch (el.type) {
       case 'text':
@@ -123,27 +131,20 @@ props.fields.forEach(el => {
       case 'date':
       case 'phone':
       case 'password': {
-        formData[el.uuid] = ''
+        formData[el.formField] = ''
         break
       }
       case 'select': {
-        formData[el.uuid] = 0
+        formData[el.formField] = 0
         break
       }
       case 'checkbox': {
-        formData[el.uuid] = false
+        formData[el.formField] = false
         break
       }
       default: throw new Error('Invalid form field type: ' + el.type)
     }
 })
-
-const sendForm = () => {
-  setTimeout(
-    () => console.log('success'),
-    100
-  )
-}
 </script>
 
 <style lang="sass" scoped>

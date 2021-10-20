@@ -2,9 +2,15 @@
   <CreateUserForm
     class="form"
     title="Создать пользователя"
-    sendText="Отправить"
+    sendText="Создать"
     :fields="fields"
-  />
+    @submit="sendForm"
+  >
+    <Button
+      label="Сгенерировать пароль"
+      @click="generatePassword"
+    />
+  </CreateUserForm>
 </template>
 
 <script lang="ts" setup>
@@ -15,6 +21,7 @@ const fields: IFormField[] = [
   {
     type: 'text',
     uuid: uuid(),
+    formField: 'nickname',
     label: 'Nickname',
     required: true,
     placeholder: 'Nickname'
@@ -22,6 +29,7 @@ const fields: IFormField[] = [
   {
     type: 'email',
     uuid: uuid(),
+    formField: 'email',
     label: 'Email',
     required: true,
     placeholder: 'email@example.com'
@@ -29,12 +37,14 @@ const fields: IFormField[] = [
   {
     type: 'date',
     uuid: uuid(),
+    formField: 'birth_date',
     label: 'Date of birthday',
     required: false
   },
   {
     type: 'select',
     uuid: uuid(),
+    formField: 'position_id',
     label: 'Position',
     required: false,
     placeholder: 'Select the position',
@@ -56,12 +66,14 @@ const fields: IFormField[] = [
   {
     type: 'checkbox',
     uuid: uuid(),
+    formField: 'is_admin',
     label: 'Is admin',
     required: false
   },
   {
     type: 'checkbox',
     uuid: uuid(),
+    formField: 'user_rights[0]',
     label: 'Чтение',
     required: false,
     reference: ['Is admin'],
@@ -71,6 +83,7 @@ const fields: IFormField[] = [
   {
     type: 'checkbox',
     uuid: uuid(),
+    formField: 'user_rights[1]',
     label: 'Удаление',
     required: false,
     reference: ['Is admin'],
@@ -79,6 +92,7 @@ const fields: IFormField[] = [
   {
     type: 'phone',
     uuid: uuid(),
+    formField: 'phone',
     label: 'Phone number',
     required: false,
     placeholder: '+7 XXX XXX XX XX'
@@ -86,6 +100,7 @@ const fields: IFormField[] = [
   {
     type: 'password',
     uuid: uuid(),
+    formField: 'password',
     label: 'Password',
     required: true,
     placeholder: 'Password'
@@ -93,19 +108,38 @@ const fields: IFormField[] = [
   {
     type: 'password',
     uuid: uuid(),
+    formField: 'password_confirm',
     label: 'Confirm password',
     required: true,
     placeholder: 'Retype password'
   }
 ]
 fields.forEach((el: IFormField) => {
-  if (el.reference) {
+  if (el.reference)
     el.reference =
       el.reference
         .map((el: string) =>
           fields.find((field: IFormField) => field.label === el)?.uuid
         )
-        .filter(el => !!el)
-  }
+        .filter((el: string | undefined) => !!el)
 })
+
+const sendForm = async (data: { [key: string]: string }): Promise<void> => {
+  setTimeout(
+    () => console.table(JSON.parse(JSON.stringify(data))),
+    100
+  )
+}
+
+const generatePassword = (): void => {
+  const password = btoa(String(10240 * Math.random())).slice(0, 12)
+  fields
+    .filter((el: IFormField) => el.type === 'password')
+    .forEach((el: IFormField) => {
+      el.value = password
+      const element = document.getElementById(el.uuid)
+      if (element)
+        element.setAttribute('value', password)
+    })
+}
 </script>

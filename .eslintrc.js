@@ -21,7 +21,8 @@ module.exports = {
     'brace-style': [
       'error',
       'stroustrup'
-    ]
+    ],
+    'no-return-assign': 'off'
   },
   overrides: [
     {
