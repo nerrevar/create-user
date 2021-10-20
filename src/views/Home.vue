@@ -4,6 +4,7 @@
     title="Создать пользователя"
     sendText="Создать"
     :fields="fields"
+    :validations="validations"
     @submit="sendForm"
   >
     <Button
@@ -15,6 +16,7 @@
 
 <script lang="ts" setup>
 import CreateUserForm, { IFormField } from '@/components/CreateUserForm.vue'
+import { required, email } from '@vuelidate/validators'
 import { v1 as uuid } from 'uuid'
 
 const fields: IFormField[] = [
@@ -24,7 +26,8 @@ const fields: IFormField[] = [
     formField: 'nickname',
     label: 'Nickname',
     required: true,
-    placeholder: 'Nickname'
+    placeholder: 'Nickname',
+    validators: { required }
   },
   {
     type: 'email',
@@ -32,7 +35,8 @@ const fields: IFormField[] = [
     formField: 'email',
     label: 'Email',
     required: true,
-    placeholder: 'email@example.com'
+    placeholder: 'email@example.com',
+    validators: { required, email }
   },
   {
     type: 'date',
@@ -103,7 +107,8 @@ const fields: IFormField[] = [
     formField: 'password',
     label: 'Password',
     required: true,
-    placeholder: 'Password'
+    placeholder: 'Password',
+    validators: { required }
   },
   {
     type: 'password',
@@ -111,7 +116,8 @@ const fields: IFormField[] = [
     formField: 'password_confirm',
     label: 'Confirm password',
     required: true,
-    placeholder: 'Retype password'
+    placeholder: 'Retype password',
+    validators: { required }
   }
 ]
 fields.forEach((el: IFormField) => {
@@ -121,7 +127,7 @@ fields.forEach((el: IFormField) => {
         .map((el: string) =>
           fields.find((field: IFormField) => field.label === el)?.uuid
         )
-        .filter((el: string | undefined) => !!el)
+        .filter((el: string | undefined) => !!el) as string[] | undefined
 })
 
 const sendForm = async (data: { [key: string]: string }): Promise<void> => {

@@ -23,14 +23,21 @@
       </label>
 
       <InputText
-        class="form__field"
         v-if="['text', 'email'].includes(item.type)"
+        class="form__field"
+        :class="{
+          'p-invalid': v$[item.formField]?.$invalid
+        }"
         :id="item.uuid"
         :placeholder="item.placeholder"
         v-model="formData[item.formField]"
       />
       <Calendar
         v-if="item.type === 'date'"
+        class="form__field"
+        :class="{
+          'p-invalid': v$[item.formField]?.$invalid
+        }"
         :id="item.uuid"
         :monthNavigator="true"
         :yearNavigator="true"
@@ -39,6 +46,10 @@
       />
       <Dropdown
         v-if="item.type === 'select'"
+        class="form__field"
+        :class="{
+          'p-invalid': v$[item.formField]?.$invalid
+        }"
         :id="item.uuid"
         :options="item.options"
         optionLabel="name"
@@ -48,6 +59,10 @@
       />
       <Checkbox
         v-if="item.type === 'checkbox'"
+        class="form__field"
+        :class="{
+          'p-invalid': v$[item.formField]?.$invalid
+        }"
         :id="item.uuid"
         :binary="true"
         :value="item.value"
@@ -68,6 +83,10 @@
       </label>
       <InputMask
         v-if="item.type === 'phone'"
+        class="form__field"
+        :class="{
+          'p-invalid': v$[item.formField]?.$invalid
+        }"
         :id="item.uuid"
         mask="+7 999 999 99 99"
         :placeholder="item.placeholder"
@@ -75,11 +94,24 @@
       />
       <Password
         v-if="item.type === 'password'"
+        class="form__field"
+        :class="{
+          'p-invalid': v$[item.formField]?.$invalid
+        }"
         :id="item.uuid"
         :placeholder="item.placeholder"
         v-model="formData[item.formField]"
         @change="formData[item.formField] = $event.data"
       />
+
+      <div
+        class="form__error"
+        style="color: var(--text-danger)"
+        v-for="(item, index) in v$[item.formField]?.$errors"
+        :key="index"
+      >
+        {{ item.$message }}
+      </div>
     </div>
     <slot />
     <Button
@@ -91,6 +123,7 @@
 
 <script lang="ts" setup>
 import { computed, defineProps, reactive } from 'vue'
+import useVuelidate, { ValidationArgs, ValidationRule } from '@vuelidate/core'
 
 export interface ISelectOption {
   name: string,
@@ -107,7 +140,8 @@ export interface IFormField {
   options?: ISelectOption[],
   reference?: string[] | undefined,
   disabled?: boolean,
-  value?: string | number | boolean
+  value?: string | number | boolean,
+  validators?: { [key: string]: ValidationRule }
 }
 
 const props = defineProps<{
@@ -145,6 +179,17 @@ props.fields.forEach(el => {
       default: throw new Error('Invalid form field type: ' + el.type)
     }
 })
+
+const rules = reactive(Object.fromEntries(
+  filteredFields.value
+    .filter(el => !!el.validators)
+    .map((el: IFormField) => [
+      el.formField,
+      el.validators
+    ])
+) as ValidationArgs)
+
+const v$ = useVuelidate(rules, formData)
 </script>
 
 <style lang="sass" scoped>
