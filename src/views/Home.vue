@@ -144,8 +144,12 @@ const generatePassword = (): void => {
     .forEach((el: IFormField) => {
       el.value = password
       const element = document.getElementById(el.uuid)
-      if (element)
+      if (element) {
         element.setAttribute('value', password)
+        const event = new Event('HTMLEvents')
+        event.initEvent('change', false, true)
+        element.dispatchEvent(event)
+      }
     })
 }
 </script>

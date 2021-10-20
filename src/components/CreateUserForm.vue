@@ -26,7 +26,7 @@
         v-if="['text', 'email'].includes(item.type)"
         class="form__field"
         :class="{
-          'p-invalid': v$[item.formField]?.$invalid
+          'p-invalid': v$[item.formField]?.$message
         }"
         :id="item.uuid"
         :placeholder="item.placeholder"
@@ -36,7 +36,7 @@
         v-if="item.type === 'date'"
         class="form__field"
         :class="{
-          'p-invalid': v$[item.formField]?.$invalid
+          'p-invalid': v$[item.formField]?.$message
         }"
         :id="item.uuid"
         :monthNavigator="true"
@@ -48,7 +48,7 @@
         v-if="item.type === 'select'"
         class="form__field"
         :class="{
-          'p-invalid': v$[item.formField]?.$invalid
+          'p-invalid': v$[item.formField]?.$message
         }"
         :id="item.uuid"
         :options="item.options"
@@ -61,7 +61,7 @@
         v-if="item.type === 'checkbox'"
         class="form__field"
         :class="{
-          'p-invalid': v$[item.formField]?.$invalid
+          'p-invalid': v$[item.formField]?.$message
         }"
         :id="item.uuid"
         :binary="true"
@@ -85,7 +85,7 @@
         v-if="item.type === 'phone'"
         class="form__field"
         :class="{
-          'p-invalid': v$[item.formField]?.$invalid
+          'p-invalid': v$[item.formField]?.$message
         }"
         :id="item.uuid"
         mask="+7 999 999 99 99"
@@ -96,12 +96,14 @@
         v-if="item.type === 'password'"
         class="form__field"
         :class="{
-          'p-invalid': v$[item.formField]?.$invalid
+          'p-invalid': v$[item.formField]?.$message
         }"
         :id="item.uuid"
         :placeholder="item.placeholder"
+        :feedback="false"
+        toggleMask
         v-model="formData[item.formField]"
-        @change="formData[item.formField] = $event.data"
+        @change="formData[item.formField] = $event.target.value"
       />
 
       <div
@@ -116,13 +118,13 @@
     <slot />
     <Button
       :label="sendText"
-      @click="$emit('submit', formData)"
+      @click="onSubmit"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, defineProps, reactive } from 'vue'
+import { computed, defineProps, defineEmits, reactive } from 'vue'
 import useVuelidate, { ValidationArgs, ValidationRule } from '@vuelidate/core'
 
 export interface ISelectOption {
@@ -149,6 +151,8 @@ const props = defineProps<{
   sendText: string,
   fields: IFormField[]
 }>()
+
+const emit = defineEmits(['submit'])
 
 const filteredFields = computed(() => props.fields.filter(el =>
   !el.reference || el.reference.every(el => !!formData[el])
@@ -190,6 +194,12 @@ const rules = reactive(Object.fromEntries(
 ) as ValidationArgs)
 
 const v$ = useVuelidate(rules, formData)
+
+const onSubmit = (): void => {
+  v$.value.$validate()
+  if (!v$.value.$errors.length)
+    emit('submit', formData)
+}
 </script>
 
 <style lang="sass" scoped>
